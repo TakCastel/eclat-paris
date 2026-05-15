@@ -1,0 +1,73 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Category {
+  id        String    @id @default(cuid())
+  name      String
+  slug      String    @unique
+  imageUrl  String?
+  createdAt DateTime  @default(now())
+  products  Product[]
+}
+
+model Product {
+  id           String      @id @default(cuid())
+  name         String
+  slug         String      @unique
+  tagline      String?
+  description  String?
+  ingredients  String?
+  categoryId   String?
+  price        Float
+  comparePrice Float?
+  images       String      @default("[]")
+  rating       Float       @default(0)
+  reviewCount  Int         @default(0)
+  stock        Int         @default(100)
+  sizes        String      @default("[]")
+  skinTypes    String      @default("[]")
+  isBestseller Boolean     @default(false)
+  createdAt    DateTime    @default(now())
+  category     Category?   @relation(fields: [categoryId], references: [id])
+  orderItems   OrderItem[]
+}
+
+model Order {
+  id                 String      @id @default(cuid())
+  email              String
+  status             String      @default("pending")
+  subtotal           Float
+  shipping           Float       @default(0)
+  total              Float
+  shippingFirstname  String?
+  shippingLastname   String?
+  shippingAddress    String?
+  shippingCity       String?
+  shippingPostalCode String?
+  shippingCountry    String      @default("France")
+  shippingMethod     String      @default("standard")
+  stripeSessionId    String?     @unique
+  createdAt          DateTime    @default(now())
+  items              OrderItem[]
+}
+
+model OrderItem {
+  id           String   @id @default(cuid())
+  orderId      String
+  productId    String?
+  productName  String
+  productImage String?
+  size         String?
+  quantity     Int
+  unitPrice    Float
+  createdAt    DateTime @default(now())
+  order        Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product      Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+}
