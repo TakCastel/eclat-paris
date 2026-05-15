@@ -18,6 +18,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(product, { status: 201 })
   } catch (err) {
     console.error('POST /api/admin/products:', err)
-    return NextResponse.json({ error: 'Erreur lors de la création du produit' }, { status: 500 })
+    return NextResponse.json({ error: 'Erreur lors de la création du produit', detail: String(err) }, { status: 500 })
   }
 }

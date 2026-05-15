@@ -3,6 +3,8 @@ import { Plus, Pencil } from 'lucide-react'
 import { db } from '@/lib/db'
 import DeleteButton from '@/components/admin/DeleteButton'
 
+export const dynamic = 'force-dynamic'
+
 export default async function ProduitsPage() {
   const products = await db.products.findMany()
 
