@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
     const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
     const arrayBuffer = await file.arrayBuffer()
 
-    if (process.env.NETLIFY === 'true') {
+    if (process.env.NETLIFY_BLOBS_CONTEXT) {
       const { getStore } = await import('@netlify/blobs')
       const store = getStore('images')
       await store.set(filename, arrayBuffer, { metadata: { contentType: file.type } })
