@@ -16,8 +16,11 @@ export async function POST(req: NextRequest) {
     const body = await req.json()
     const product = await db.products.create(body)
     return NextResponse.json(product, { status: 201 })
-  } catch (err) {
+  } catch (err: any) {
     console.error('POST /api/admin/products:', err)
-    return NextResponse.json({ error: 'Erreur lors de la création du produit', detail: String(err) }, { status: 500 })
+    if (err?.code === 'P2002' || String(err).includes('UNIQUE constraint')) {
+      return NextResponse.json({ error: 'Ce slug est déjà utilisé par un autre produit' }, { status: 409 })
+    }
+    return NextResponse.json({ error: 'Erreur lors de la création du produit' }, { status: 500 })
   }
 }

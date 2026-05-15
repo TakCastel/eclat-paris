@@ -25,8 +25,11 @@ export async function PUT(
     const body = await req.json()
     const product = await db.products.update(id, body)
     return NextResponse.json(product)
-  } catch (err) {
+  } catch (err: any) {
     console.error('PUT /api/admin/products/[id]:', err)
+    if (err?.code === 'P2002' || String(err).includes('UNIQUE constraint')) {
+      return NextResponse.json({ error: 'Ce slug est déjà utilisé par un autre produit' }, { status: 409 })
+    }
     return NextResponse.json({ error: 'Erreur lors de la mise à jour' }, { status: 500 })
   }
 }
