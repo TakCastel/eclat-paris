@@ -2,12 +2,22 @@ import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 
 export async function GET() {
-  const products = await db.products.findMany()
-  return NextResponse.json(products)
+  try {
+    const products = await db.products.findMany()
+    return NextResponse.json(products)
+  } catch (err) {
+    console.error('GET /api/admin/products:', err)
+    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 })
+  }
 }
 
 export async function POST(req: NextRequest) {
-  const body = await req.json()
-  const product = await db.products.create(body)
-  return NextResponse.json(product, { status: 201 })
+  try {
+    const body = await req.json()
+    const product = await db.products.create(body)
+    return NextResponse.json(product, { status: 201 })
+  } catch (err) {
+    console.error('POST /api/admin/products:', err)
+    return NextResponse.json({ error: 'Erreur lors de la création du produit' }, { status: 500 })
+  }
 }

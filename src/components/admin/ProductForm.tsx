@@ -82,8 +82,8 @@ export default function ProductForm({ product, categories }: Props) {
         fd.append('file', file)
         const res = await fetch('/api/admin/upload', { method: 'POST', body: fd })
         if (!res.ok) {
-          const data = await res.json()
-          throw new Error(data.error ?? 'Erreur upload image')
+          const data = await res.json().catch(() => ({}))
+          throw new Error(data.error ?? `Erreur upload (${res.status})`)
         }
         const { url } = await res.json()
         uploadedUrls.push(url)
@@ -115,8 +115,8 @@ export default function ProductForm({ product, categories }: Props) {
       })
 
       if (!res.ok) {
-        const data = await res.json()
-        throw new Error(data.error ?? 'Erreur serveur')
+        const data = await res.json().catch(() => ({}))
+        throw new Error(data.error ?? `Erreur serveur (${res.status})`)
       }
 
       router.push('/admin/produits')
