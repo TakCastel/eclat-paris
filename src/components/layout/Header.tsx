@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Search, User, ShoppingBag, Menu, X } from 'lucide-react'
 import { useCartStore } from '@/lib/cart-store'
 import CartDrawer from './CartDrawer'
@@ -18,6 +18,15 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false)
   const { itemCount, openCart } = useCartStore()
   const count = itemCount()
+
+  useEffect(() => {
+    if (menuOpen) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+    return () => { document.body.style.overflow = '' }
+  }, [menuOpen])
 
   return (
     <>
@@ -75,29 +84,62 @@ export default function Header() {
               <button
                 className="md:hidden text-stone-600"
                 onClick={() => setMenuOpen(!menuOpen)}
+                aria-label="Menu"
               >
                 {menuOpen ? <X size={20} /> : <Menu size={20} />}
               </button>
             </div>
           </div>
         </div>
-
-        {/* Menu mobile */}
-        {menuOpen && (
-          <div className="md:hidden border-t border-stone-100 bg-white px-4 py-4 flex flex-col gap-4">
-            {navLinks.map((l) => (
-              <Link
-                key={l.href}
-                href={l.href}
-                className="text-sm text-stone-700 hover:text-stone-900 py-1"
-                onClick={() => setMenuOpen(false)}
-              >
-                {l.label}
-              </Link>
-            ))}
-          </div>
-        )}
       </header>
+
+      {/* Overlay */}
+      {menuOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/30 md:hidden"
+          onClick={() => setMenuOpen(false)}
+        />
+      )}
+
+      {/* Drawer mobile */}
+      <div
+        className={`fixed top-0 left-0 z-50 h-full w-72 bg-white flex flex-col md:hidden transition-transform duration-300 ease-in-out ${
+          menuOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
+        <div className="flex items-center justify-between px-6 h-16 border-b border-stone-100">
+          <Link href="/" onClick={() => setMenuOpen(false)}>
+            <span className="font-serif text-xl tracking-[0.25em] text-stone-900 uppercase">Éclat</span>
+            <span className="block text-[8px] tracking-[0.4em] text-stone-500 uppercase -mt-0.5">Paris</span>
+          </Link>
+          <button onClick={() => setMenuOpen(false)} className="text-stone-500 hover:text-stone-900">
+            <X size={20} />
+          </button>
+        </div>
+
+        <nav className="flex-1 overflow-y-auto px-6 py-6 flex flex-col gap-1">
+          {navLinks.map((l) => (
+            <Link
+              key={l.href}
+              href={l.href}
+              className="py-3 text-base text-stone-700 hover:text-stone-900 border-b border-stone-100 tracking-wide"
+              onClick={() => setMenuOpen(false)}
+            >
+              {l.label}
+            </Link>
+          ))}
+        </nav>
+
+        <div className="px-6 py-6 border-t border-stone-100 flex items-center gap-5">
+          <button className="flex items-center gap-2 text-sm text-stone-500 hover:text-stone-900">
+            <Search size={16} /> Recherche
+          </button>
+          <button className="flex items-center gap-2 text-sm text-stone-500 hover:text-stone-900">
+            <User size={16} /> Compte
+          </button>
+        </div>
+      </div>
+
       <CartDrawer />
     </>
   )
